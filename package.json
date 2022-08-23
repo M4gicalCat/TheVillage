@@ -12,7 +12,7 @@
    },
    "repository": {
       "type": "git",
-      "url": "git+https://github.com/loann25310/ptut_s3_s4.git"
+      "url": "git+https://github.com/M4gicalCat/TheVillage.git"
    },
    "keywords": [
       "game"
@@ -20,9 +20,9 @@
    "author": "Loann, Odysee, Alitaro, Slaym, M4gicalCat",
    "license": "ISC",
    "bugs": {
-      "url": "https://github.com/loann25310/ptut_s3_s4/issues"
+      "url": "https://github.com/M4gicalCat/TheVillage/issues"
    },
-   "homepage": "https://github.com/loann25310/ptut_s3_s4#readme",
+   "homepage": "https://github.com/M4gicalCat/TheVillage#readme",
    "dependencies": {
       "@fortawesome/fontawesome-free": "^5.15.4",
       "@types/multer": "^1.4.7",

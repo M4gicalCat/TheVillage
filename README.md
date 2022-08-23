@@ -1,6 +1,6 @@
-# [The Village](https://thevillage.lagardedev.fr)
+# The Village
 ### Projet Tutoré S3-S4 2021-2022
-[Github](https://github.com/loann25310/TheVillage)
+[Github](https://github.com/M4gicalCat/TheVillage)
 ## Tuteur
 Jérôme HILDENBRAND
 
@@ -37,7 +37,16 @@ La partie s'arrête dès qu'un des deux camps n'a plus de joueurs en vie.
 (Des variantes pourront proposer des fins alternatives par la suite)
 
 ## Début du projet
-**20 Septembre 2021** (20/09/2021)
+**20 septembre 2021** (20/09/2021)
+
+## Fin du projet
+**01 avril 2022** (01/04/2022)
+
+## Reprise personnelle du projet
+**23 août 2022** (23/08/2022)
+
+## Projet rendu
+### [TheVillage](https://github.com/loann25310/TheVillage)
 
 ## Version
 **1.0.0**
@@ -45,12 +54,12 @@ La partie s'arrête dès qu'un des deux camps n'a plus de joueurs en vie.
 ## Installation
 
 ### 1. Verification des prérequis
-Verifiez que vous possedez nodeJS en version 16. Entrez la commande dans un terminal :
+Vérifiez que vous possédez nodeJS en version 16. Entrez la commande dans un terminal :
 ```shell
 node -v
 ```
-Si la commande vous retourne une erreur c'est que vous ne possedez pas nodeJS passer à la section : ``Installation de NodeJS 16``.
-Si la commande vous retourne une valeur du style : ``v16.x.x`` c'est que vous possedez NodeJS en version 16.
+Si la commande vous retourne une erreur, vous ne possédez pas nodeJS passer à la section : ``Installation de NodeJS 16``.
+Si la commande vous retourne une valeur du style : ``v16.x.x``, que vous possédez NodeJS en version 16.
 Vous pouvez donc passer à l'étape suivante.
 
 ### 3. Mise en place d'une base de donnée
@@ -87,8 +96,8 @@ exit;
 ### 3. Installation du projet
 Dans un terminal, tapez les commandes suivantes :
 ```shell
-git clone https://github.com/loann25310/TheVillage.git ./TheVillage
-cd ./Thevillage
+git clone https://github.com/M4gicalCat/TheVillage.git ./TheVillage
+cd ./TheVillage
 cp ormconfig.exemple.json ormconfig.json
 cp config.example.json config.json
 npm install
