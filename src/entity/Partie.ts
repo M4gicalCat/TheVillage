@@ -18,7 +18,7 @@ export enum PartieStatus {
 @Entity()
 export class Partie {
 
-    public static readonly NB_JOUEURS_MIN = 5;
+    public static readonly NB_JOUEURS_MIN = 2;
     public static readonly NB_TASKS_PER_DAY = 2;
 
     @PrimaryColumn()
@@ -39,17 +39,17 @@ export class Partie {
     @Column({
         default: 10
     })
-    nbJoueursMax :number;
+    nbJoueursMax: number;
 
     @Column({
         default: 60
     })
-    dureeVote :number;
+    dureeVote: number;
 
     @Column({
         default: 240
     })
-    dureeNuit :number;
+    dureeNuit: number;
 
     @Column({
         default: 0
@@ -59,7 +59,7 @@ export class Partie {
     @Column({
         type: "simple-json",
     })
-    players: number[];
+    players: Array<number>;
 
     @Column({
         type: "simple-json",
@@ -81,7 +81,7 @@ export class Partie {
 
     idTasks: {id: number, tasks: string[]}[];
 
-    deadPlayers: number[];
+    deadPlayers: Array<number>;
 
     actions: Action[];
 
@@ -145,6 +145,7 @@ export class Partie {
             joueurs.push(j.splice(Math.floor(Math.random() * j.length), 1)[0]);
         }
         this.roles = [];
+        // todo changer le nombre de LG dans la partie en f° du nombre de joueurs
         this.roles.push({uid : joueurs[0], role: Roles.Voyante});
         this.roles.push({uid : joueurs[1], role: Roles.Sorciere});
         this.roles.push({uid : joueurs[2], role: Roles.Chasseur});
@@ -285,6 +286,12 @@ export class Partie {
     }
 
     //true = villager win, false = werewolves win
+    /**
+     * Grants exp to every player in the game.
+     * Grants more exp if the player won than if the player lost the game.
+     * It also adds `1` to player.nbPartiesJouees or player.nbPartieGagnees (depending on the win / loss of the game).
+     * @param winner
+     */
     async assignXP(winner) {
         const uRepo = getRepository(User);
         for (const p of this.inGamePlayers) {
@@ -299,7 +306,12 @@ export class Partie {
                 } else {
                     user.xp += ((role.role === Roles.LoupGarou) !== winner) ? 200 : 100;
                 }
+                // Partie gagnée
+                if (((role.role === Roles.LoupGarou) !== winner)) {
+                    user.nbPartiesGagnees++;
+                }
             }
+            user.nbPartiesJouees++;
             if (user.xp >= (user.niveau + 1) * 10) {
                 user.niveau += 1;
                 user.xp -= (user.niveau) * 10;
