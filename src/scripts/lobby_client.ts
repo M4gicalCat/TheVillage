@@ -251,21 +251,16 @@ function create_message(user, msg) {
 
 function create_players(players) {
     users.empty();
-    for (let i = 0; i < players.length; i++) {
-        users.append(create_user_tag(players[i], i));
-        let avatar = $(`#avatar_${i}`);
-        if (players[i].avatar.startsWith("#"))
-            avatar.css("background-color", players[i].avatar);
-    }
+    players.forEach(p => users.append(create_user_tag(p)));
 }
 
-function create_user_tag(p, index :number) {
-    let div = $(`<div id="user_${index}">`);
+function create_user_tag(p) {
+    let div = $(`<div>`);
     div.addClass("user");
 
     let html = `<div class="container">`;
     html += p.avatar.startsWith("#")
-        ? `<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt=" "><div id="avatar_${index}" class="avatar"></div>`
+        ? `<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt=" "><div style="background-color: ${p.avatar}" class="avatar"></div>`
         : `<img src="/avatars/${p.avatar}" alt=" ">`;
     html += `</div>
         <span class="pseudo">${p.pseudo} `;
