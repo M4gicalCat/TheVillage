@@ -1,7 +1,7 @@
 import {Column, Entity, getRepository, PrimaryColumn} from "typeorm";
 
 import {User} from "./User";
-import {Map} from "./Map";
+import {Map as Carte} from "./Map";
 import {Roles} from "./types/Roles";
 import {Action} from "./Action";
 import {ActionType} from "./types/ActionType";
@@ -19,6 +19,7 @@ export enum PartieStatus {
 export class Partie {
 
     public static readonly NB_JOUEURS_MIN = 2;
+    public static readonly NB_JOUEURS_MAX = 15;
     public static readonly NB_TASKS_PER_DAY = 2;
 
     @PrimaryColumn()
@@ -88,7 +89,13 @@ export class Partie {
     votes: {id: number, nb_votes: number}[];
 
     async getPlayers(): Promise<User[]> {
-        return await getRepository(User).findByIds(this.players);
+        const repo = getRepository(User);
+        const players = [];
+        for (const id of this.players) {
+            const p = await repo.findOne({where: [{id}], relations: ['roles']});
+            players.push(p);
+        }
+        return players.filter(p => !!p);
     }
 
     addPlayer(userId: number): boolean{
@@ -120,18 +127,18 @@ export class Partie {
         return this.inGamePlayers.includes(user.id);
     }
 
-    async start(){
+    async start() {
         this.status = PartieStatus.STARTING;
         this.init();
         await getRepository(Partie).save(this);
     }
 
-    getMap(fs, path): Map {
+    getMap(fs, path): Carte {
         try {
             if(this.map !== "")
-                return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../../public/maps/officials/${this.map}.json`), "utf-8")) as Map;
+                return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../../public/maps/officials/${this.map}.json`), "utf-8")) as Carte;
         } catch (e) {}
-        return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../../public/maps/officials/The_village.json`), "utf-8")) as Map;
+        return JSON.parse(fs.readFileSync(path.resolve(__dirname, `../../public/maps/officials/The_village.json`), "utf-8")) as Carte;
     }
 
     /**
@@ -145,6 +152,7 @@ export class Partie {
             joueurs.push(j.splice(Math.floor(Math.random() * j.length), 1)[0]);
         }
         this.roles = [];
+
         // todo changer le nombre de LG dans la partie en f° du nombre de joueurs
         this.roles.push({uid : joueurs[0], role: Roles.Voyante});
         this.roles.push({uid : joueurs[1], role: Roles.Sorciere});

@@ -1,6 +1,7 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToMany} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable} from "typeorm";
 import {Skin} from "./Skin";
 import {Succes} from "./Succes";
+import {Role} from "./Role";
 
 export enum UserColor {
     blanc = "blanc",
@@ -69,8 +70,13 @@ export class User {
     color: UserColor;
 
     @ManyToMany(() => Succes)
+    @JoinTable()
     succes: Succes[];
 
     @ManyToMany(() => Skin)
+    @JoinTable()
     skins: Skin[];
+    @ManyToMany(() => Role, role => role.users)
+    @JoinTable()
+    roles: Role[];
 }

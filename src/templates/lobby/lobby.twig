@@ -13,7 +13,7 @@
             <h2>Configuration de la partie</h2>
             <div id="game_master_settings">
                 <fieldset id="fieldset" disabled>
-                    <ul id="list_config_partie">
+                    <ul id="list_config_partie" class="list_config">
                         <li>
                             <h3>Visibilité de la partie</h3>
                             <ul class="sous-liste">
@@ -27,11 +27,22 @@
                             <div id="config_joueurs_max">
                                 <ul class="sous-liste">
                                     <li>
-                                        <input type="range" min="7" max="15" id="change_max_players">
+                                        <input type="range" min="7" max="15" id="change_max_players" aria-label="Nombre de joueurs maximum">
                                     </li>
                                 </ul>
                             </div>
                         </li>
+                        {#<li>
+                            <h3>Nombre de joueurs dans le camp des Loup-garous</h3>
+                            <div id="config_nb_loup_garous">
+                                <ul class="sous-liste">
+                                    <li>
+                                        <input type="range" min="1" value="1" max="4" id="change_nb_loup_garous" aria-label="Nombre de joueurs dans le camp des Loup-garous">
+                                        <span id="nb_loups_garous">1</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>#}
                         <li>
                             <h3>Gestion des joueurs</h3>
                             <ul class="sous-liste">
@@ -45,10 +56,14 @@
                         <li>
                             <h3>Carte à utiliser</h3>
                             <div id="config_map">
-                                <label for="nom_map">Nom de la carte</label>
-                                <select name="nom_map" id="nom_map">
-                                    <option value="The_village">Carte par défaut</option>
-                                </select>
+                                <ul class="sous-liste">
+                                    <li>
+                                        <label for="nom_map">Nom de la carte</label>
+                                        <select name="nom_map" id="nom_map">
+                                            <option value="The_village">Carte par défaut</option>
+                                        </select>
+                                    </li>
+                                </ul>
                             </div>
                         </li>
                     </ul>
@@ -57,7 +72,21 @@
             </div>
 
             <h2>Configuration personnelle</h2>
-
+            <div id="personal_settings">
+                <ul id="list_config_perso" class="list_config">
+                    <li>
+                        <h3>Choix du rôle</h3>
+                        <ul class="sous-liste">
+                            <li>
+                                <div id="container_choice_of_role"></div>
+                            </li>
+                            <li>
+                                Choisissez un rôle. Une personne (vous ou un autre joueur) se le verra attribuer, sous réserve qu'il y ait assez de joueurs.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 

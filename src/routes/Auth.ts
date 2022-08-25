@@ -6,6 +6,8 @@ import {envoyerMail} from "./Mail";
 import {verifMdp} from "../scripts/VerifMdp"
 import {RecuperationEmail} from "../entity/RecuperationEmail";
 import {RememberMeToken} from "../entity/RememberMeToken";
+import {Role} from "../entity/Role";
+import {Roles} from "../entity/types/Roles";
 const passport = require("passport");
 const bcrypt = require('bcrypt');
 //pour hash le mdp
@@ -72,7 +74,12 @@ export function Route(router: Router) {
             user.skins = [];
             user.partie = "";
             user.avatar = `#${Math.floor(Math.random()*16777215).toString(16)}`;
-            repo.save(user).then((r) => {
+
+            user.roles = await getRepository(Role).createQueryBuilder("role")
+                .where("role = :villageois", {villageois: Roles.Villageois})
+                .orWhere("role = :loupGarou", {loupGarou: Roles.LoupGarou})
+                .getMany();
+            repo.save(user).then((user) => {
                 return res.redirect("/auth?mail=" + user.adresseMail);
             });
         })

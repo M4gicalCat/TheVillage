@@ -14,8 +14,8 @@ import {Server} from "socket.io";
 import {User} from "./entity/User";
 import logger = require("node-color-log");
 import * as session from "express-session";
-// import { Strategy as RememberMeStrategy } from "passport-remember-me";
 import {RememberMeToken} from "./entity/RememberMeToken";
+import {Role} from "./entity/Role";
 
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -35,7 +35,7 @@ let urlWithoutAuth :string[] = [
     "/auth *",
     "/credits *"
 ];
-
+console.clear();
 logger.info("Starting The Village");
 
 logger.info("Loading configuration...");
@@ -44,8 +44,10 @@ Config.CONFIGURATION = config;
 logger.info("Configuration loaded !");
 
 logger.info("Connecting to database...");
-createConnection().then(async connection => {
+createConnection().then(async () => {
     logger.info("Connected to database !");
+
+    await Role.init();
 
     logger.info("Creating Web Server...");
     const app: Express = express();
@@ -60,7 +62,7 @@ createConnection().then(async connection => {
 
     app.use(express.json());
     app.use(express.static(__dirname + '/../public'));
-    const env = nunjucks.configure(__dirname + '/templates/', {
+    /*const env = */nunjucks.configure(__dirname + '/templates/', {
         autoescape: false,
         express: app,
         watch: (config.env === 'debug')
@@ -74,10 +76,9 @@ createConnection().then(async connection => {
     //const httpServerIO = createServer({
     //    key: readFileSync("/etc/letsencrypt/live/thevillage.lagardedev.fr/privkey.pem"),
     //    cert: readFileSync("/etc/letsencrypt/live/thevillage.lagardedev.fr/fullchain.pem")
-    //});
-    //@ts-ignore
+    //})
     const io = new Server(httpServer);
-    // const io = new Server(httpServer);
+
     logger.info("Web Server created !");
 
     logger.info("Loading routes...");

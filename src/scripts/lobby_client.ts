@@ -8,6 +8,8 @@ import '@fortawesome/fontawesome-free/js/regular';
 import '@fortawesome/fontawesome-free/js/brands';
 import '../entity/Tools';
 import {Tools} from "../entity/Tools";
+import Swal from "sweetalert2";
+import {User} from "../entity/User";
 const socket = io(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
 Chart.register(...registerables);
 
@@ -29,23 +31,20 @@ let roomName = `${game.id}`,
     change_max_players = $("#change_max_players"),
     visibility = $("#visibility"),
     $maps = $("#nom_map"),
-    bans = $("#joueursBan");
+    bans = $("#joueursBan"),
+    container_choice_of_role = $("#container_choice_of_role"),
+    current_role = {div: null, role: null},
+    player: User;
 
 change_max_players.on("input", function () {
-    if (uid === game.gameMaster || (fieldset[0] as HTMLFieldSetElement).disabled)
+    if (uid === game.gameMaster || !(fieldset[0] as HTMLFieldSetElement).disabled)
         update_max_players();
 });
 
-function sendMessage() {
-    if (input.val() && `${input.val()}`.trim() !== "") {
-        socket.emit('chat_message', ...players.filter(u => u.id === uid), input.val(), roomName);
-        input.val("");
-    }
-}
 
 sendMsg.on("click", sendMessage);
 
-$(document).on("keydown", function (e){
+$(document).on("keydown", function (e) {
     if (e.code === "Enter" || e.code === "NumpadEnter")
         sendMessage();
     if (e.key === "Escape") {
@@ -67,19 +66,23 @@ socket.on('chat_message', (user, msg) => {
     messages.scrollTop(messages[0].scrollHeight);
 });
 
-socket.on("new_player", function (userId, sockId){
+socket.on("new_player", function (userId, sockId) {
     //Si le joueur est déjà connecté et joue, il est renvoyé à l'accueil
-    //(il joue avec le dernier appareil connecté
+    //(il joue avec le dernier appareil connecté).
     if (uid === userId && sockId !== socket.id)
         window.location.replace("/?otherDevice=1");
 });
 
-socket.on("players", function (p){
+socket.on("players", function (p) {
     players = p;
+    console.log(players);
     //checks that the current player is in the room
     let s = false;
     for (let i = 0; i < p.length; i++) {
-        if (p[i].id === uid) s = true;
+        if (p[i].id !== uid) continue;
+        s = true;
+        player = p[i];
+        create_choice_role();
     }
     if (!s) socket.emit('new_guy', uid, roomName);
     $("#nbPlayers").text(p.length);
@@ -127,10 +130,22 @@ socket.on("change_map", map => {
             (elem as HTMLOptionElement).selected = true;
             return;
         }
-    })
+    });
 });
 
-document.body.onload = ()=>{
+socket.on("role", (uid, role) => {
+    console.log({uid, role});
+});
+
+socket.on("erreur", e => {
+    console.log(e);
+    Swal.fire({
+        icon: "error",
+        title: e.message
+    });
+});
+
+document.body.onload = () => {
     document.title = `The Village - ${game.id}`;
     input[0].focus();
     nbPlayers.text(game.players.length);
@@ -182,6 +197,38 @@ $maps.on('change', function (e) {
 $("#start").on("click", function () {
     start_game();
 });
+
+function create_choice_role() {
+    container_choice_of_role.empty();
+    console.log(player);
+    player.roles.sort((a, b) => {
+       if (a.village === b.village) return 0;
+       if (a.village && !b.village) return 1;
+       return -1;
+    });
+    for (const role of player.roles) {
+        const outer = $("<div>").addClass("role");
+        outer.on("click", () => { select_role(role, outer); })
+            .append($("<h5>").text(role.name).css("color", role.village ? "white" : "red"))
+            .append($("<img>").attr("src", role.image).addClass("role_image"));
+        container_choice_of_role.append(outer);
+    }
+}
+
+function select_role(role, div) {
+    (current_role.div as JQuery)?.removeClass("selected");
+    div.addClass("selected");
+    current_role.role = role;
+    current_role.div = div;
+    socket.emit("role", uid, role.role, roomName);
+}
+
+function sendMessage() {
+    if (input.val() && `${input.val()}`.trim() !== "") {
+        socket.emit('chat_message', player, input.val(), roomName);
+        input.val("");
+    }
+}
 
 function start_game() {
     if (players.length >= Partie.NB_JOUEURS_MIN)

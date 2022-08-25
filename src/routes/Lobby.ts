@@ -6,6 +6,7 @@ import {getRepository} from "typeorm";
 import {Partie} from "../entity/Partie";
 import * as path from "path";
 import * as fs from "fs";
+import {Role} from "../entity/Role";
 
 export function Route(router: Router, io: Server) {
 
@@ -28,9 +29,11 @@ export function Route(router: Router, io: Server) {
                 nbPartiesJouees: p.nbPartiesJouees,
                 nbPartiesGagnees: p.nbPartiesGagnees,
                 niveau: p.niveau,
-                avatar: p.avatar
+                avatar: p.avatar,
+                roles: p.roles
             });
         }
+        console.log(users);
         io.to(roomId).emit("players", users);
         let bans = [];
         for (const b of game.bans) {
@@ -90,7 +93,8 @@ export function Route(router: Router, io: Server) {
                     nbPartiesJouees: p.nbPartiesJouees,
                     nbPartiesGagnees: p.nbPartiesGagnees,
                     niveau: p.niveau,
-                    avatar: p.avatar
+                    avatar: p.avatar,
+                    roles: p.roles
                 });
             }
             io.to(r.id).emit("players", users);
@@ -102,6 +106,7 @@ export function Route(router: Router, io: Server) {
 
         socket.on("change_max_players", async (roomId, playerId, nb) => {
             let room = await repo.findOne(roomId);
+            if (!room) return;
             if (playerId !== room.gameMaster) return io.to(roomId).emit("game_master", room.gameMaster);
             room.nbJoueursMax = nb;
             await repo.save(room);
@@ -113,6 +118,9 @@ export function Route(router: Router, io: Server) {
             if (uid !== room.gameMaster) return io.to(roomId).emit("game_master", room.gameMaster);
             room.start().then(() => {
                 io.to(roomId).emit("start_game");
+            }).catch(e => {
+                console.log(e);
+                socket.emit("erreur", e);
             });
         });
 
@@ -124,7 +132,7 @@ export function Route(router: Router, io: Server) {
             });
         });
 
-        socket.on("ban", (roomId, playerId, banId) => {
+        socket.on("ban", (roomId, playerId, banId: number) => {
             repo.findOne(roomId).then( async room => {
                 if (playerId !== room.gameMaster) return io.to(roomId).emit("game_master", room.gameMaster);
                 if (room.bans.includes(banId)) return;
@@ -176,6 +184,23 @@ export function Route(router: Router, io: Server) {
                 io.to(room).emit("change_map", map);
                 getRepository(Partie).save(r);
             });
+        });
+
+        socket.on("role", async (uid, role, roomName) => {
+            const partie = await getRepository(Partie).findOne(roomName);
+            const user = await getRepository(User).findOne({where: {id: uid}, relations: ["roles"]});
+            const _role = await getRepository(Role).findOne(role);
+            if (!partie || !user || !_role) return;
+            if (!(user.roles as Role[] ?? []).find(r => r.role === role)) return socket.emit("erreur", "Vous ne possédez pas ce rôle");
+            partie.roles ??= [];
+            const role_player = partie.roles.find(r => r.uid === uid);
+            if (role_player)
+                role_player.role = role;
+            else
+                partie.roles.push({uid, role});
+            await getRepository(Partie).save(partie);
+
+            io.to(partie.id).emit("role", uid, _role);
         });
     });
 }
