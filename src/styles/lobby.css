@@ -173,7 +173,7 @@ input[type="text"]:focus {
 
 .pseudo {
     position: absolute;
-    font-size: 1.4em;
+    font-size: 1.4rem;
     left: 25%;
     top: 30%;
     transform: translateY(-50%);
@@ -201,11 +201,11 @@ input[type="text"]:focus {
     height: 100%;
 }
 
-.level {
+.titre_role {
     position: absolute;
-    top: 50%;
+    top: calc(30% + 1.6rem);
     transform: translateY(-50%);
-    right: 10%;
+    left: 25%;
 }
 
 .invisible {

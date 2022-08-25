@@ -134,8 +134,7 @@ socket.on("change_map", map => {
 
 socket.on("role", (uid, role) => {
     console.log({uid, role});
-    //todo afficher le rôle dans le profil du joueur ?
-    // ou afficher seulement si le rôle est villageois / LG
+    $(`#titre_role_${uid}`).text(role.name);
 });
 
 socket.on("erreur", e => {
@@ -268,7 +267,7 @@ function create_user_tag(p) {
     if (p.id === game.gameMaster)
         html += `<i class="fas fa-crown yellow"></i>`;
 
-    html += `</span><span class="level">Level ${p.niveau}</span>`;
+    html += `</span><span id="titre_role_${p.id}" class="titre_role"></span>`;
     div.html(html);
     div.on('click', function () {
         if ($(".popup").length === 0)
