@@ -75,7 +75,6 @@ socket.on("new_player", function (userId, sockId) {
 
 socket.on("players", function (p) {
     players = p;
-    console.log(players);
     //checks that the current player is in the room
     let s = false;
     for (let i = 0; i < p.length; i++) {
@@ -202,7 +201,6 @@ $("#start").on("click", function () {
 
 function create_choice_role() {
     container_choice_of_role.empty();
-    console.log(player);
     player.roles.sort((a, b) => {
        if (a.village === b.village) return 0;
        if (a.village && !b.village) return 1;
@@ -214,6 +212,7 @@ function create_choice_role() {
             .append($("<h5>").text(role.name).css("color", role.village ? "white" : "red"))
             .append($("<img>").attr("src", role.image).addClass("role_image"));
         container_choice_of_role.append(outer);
+        if (current_role.role?.role === role.role) select_role(role, outer);
     }
 }
 

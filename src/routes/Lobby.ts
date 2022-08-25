@@ -33,7 +33,6 @@ export function Route(router: Router, io: Server) {
                 roles: p.roles
             });
         }
-        console.log(users);
         io.to(roomId).emit("players", users);
         let bans = [];
         for (const b of game.bans) {
