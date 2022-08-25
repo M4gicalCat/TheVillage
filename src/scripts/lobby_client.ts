@@ -135,13 +135,15 @@ socket.on("change_map", map => {
 
 socket.on("role", (uid, role) => {
     console.log({uid, role});
+    //todo afficher le rôle dans le profil du joueur ?
+    // ou afficher seulement si le rôle est villageois / LG
 });
 
 socket.on("erreur", e => {
     console.log(e);
     Swal.fire({
         icon: "error",
-        title: e.message
+        title: e.message ?? e
     });
 });
 

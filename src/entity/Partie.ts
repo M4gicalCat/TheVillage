@@ -6,6 +6,7 @@ import {Roles} from "./types/Roles";
 import {Action} from "./Action";
 import {ActionType} from "./types/ActionType";
 import {ObjectType} from "./types/ObjectType";
+import {Role} from "./Role";
 
 export enum PartieStatus {
     CREATING,
@@ -129,7 +130,7 @@ export class Partie {
 
     async start() {
         this.status = PartieStatus.STARTING;
-        this.init();
+        await this.init();
         await getRepository(Partie).save(this);
     }
 
@@ -144,24 +145,68 @@ export class Partie {
     /**
      * Creates the roles for the players in the game
      */
-    init() {
+    async init() {
         const j = [];
         this.players.forEach(p => j.push(p));
         const joueurs = [];
         while (j.length > 0){
             joueurs.push(j.splice(Math.floor(Math.random() * j.length), 1)[0]);
         }
-        this.roles = [];
+        this.roles ??= [];
 
-        // todo changer le nombre de LG dans la partie en f° du nombre de joueurs
-        this.roles.push({uid : joueurs[0], role: Roles.Voyante});
-        this.roles.push({uid : joueurs[1], role: Roles.Sorciere});
-        this.roles.push({uid : joueurs[2], role: Roles.Chasseur});
-        this.roles.push({uid : joueurs[3], role: Roles.LoupGarou});
-        this.roles.push({uid : joueurs[4], role: Roles.LoupGarou});
-        for (let i = 5; this.roles.length < this.players.length; i++) {
-            this.roles.push({uid: joueurs[i], role: Roles.Villageois});
+        const roles: Role[] = [await getRepository(Role).findOne(Roles.Villageois), await getRepository(Role).findOne(Roles.LoupGarou)];
+
+        for (const {role} of this.roles) {
+            // Si le rôle est déjà ajouté, on passe
+            if (roles.find(r => r.role === role)) continue;
+
+            const r = await getRepository(Role).findOne(role);
+            roles.push(r);
         }
+
+        roles.sort((a, b) => {
+            // Loup garou devant Village
+            if (a.village && !b.village) return 1;
+            // dans le même camp
+            if (a.village === b.village) {
+                // plus petite limite devant les autres
+                if (a.limite > b.limite) return 1;
+                // même limite
+                if (a.limite === b.limite) return 0;
+                // plus grande limite derrière
+                return -1;
+            }
+            // Village derrière Loup garou
+            return -1;
+        });
+
+        this.roles = [];
+        const nbLG = this.getNombreLoupGarous();
+
+        for (const uid of joueurs) {
+            let role = roles[0];
+            // Si le rôle a atteint sa limite (assez de joueurs le possèdent)
+            while (role.limite <= 0) {
+                roles.splice(0, 1);
+                role = roles[0];
+            }
+            // Si le rôle fait partie du camp des loup-garous et que les joueurs de ce camp sont assez nombreux
+            while (!role.village && this.roles.length >= nbLG) {
+                roles.splice(0, 1);
+                role = roles[0];
+            }
+            this.roles.push({uid, role: role.role});
+            role.limite--;
+        }
+    }
+
+    /**
+     * Returns the number of players in the Werewolves team depending on the total number of players.
+     */
+    getNombreLoupGarous(): number {
+        if (this.players.length < 6) return 1;
+        if (this.players.length < 10) return 2;
+        return Math.ceil(this.players.length / 4);
     }
 
     /**
