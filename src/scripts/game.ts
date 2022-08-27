@@ -331,7 +331,6 @@ async function init(){
     });
 
     socket.on("see_role", (data) => {
-        if (player.role !== Roles.Voyante) return console.warn("WHAAAT");
         for (const p of OTHER_PLAYERS) {
             if (p.pid === data.id) {
                 p.role = data.role;
@@ -339,7 +338,8 @@ async function init(){
             }
         }
 
-        (player as Voyante).nb_boules --;
+        if (data.voyante)
+            (player as Voyante).nb_boules --;
     });
 
     socket.on("drink", pos => {

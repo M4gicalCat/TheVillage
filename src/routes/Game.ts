@@ -190,7 +190,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                     return io.to(partie.id).emit(data.data.revive ? "revive" : "kill", data.data.player);
                 case Roles.Voyante:
                     partie.addAction(data.data.maker,ActionType.REVEAL, data.data.player);
-                    return socket.emit("see_role", {role: partie.roles.filter(p => p.uid === data.data.player)[0].role, id: data.data.player});
+                    return socket.emit("see_role", {role: partie.roles.filter(p => p.uid === data.data.player)[0].role, id: data.data.player, voyante: true});
                 case Roles.Chasseur:
                     // Même chose que pour le loup-garou
                 case Roles.LoupGarou:

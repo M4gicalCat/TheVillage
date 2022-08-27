@@ -301,6 +301,9 @@ export class Partie {
         if (compteur > 0) {
             io.to(this.id).emit("nb_tasks", compteur);
         } else {
+            for (const pid of this.deadPlayers) {
+                io.to(this.id).emit("see_role", {role: this.roles.filter(p => p.uid === pid)[0].role, id: pid});
+            }
             io.to(this.id).emit("DAY", (await getRepository(User).findByIds(this.inGamePlayers)).map(p => {return {pid: p.id, avatar: p.avatar, pseudo: p.pseudo}}));
             this.votes = [];
         }
