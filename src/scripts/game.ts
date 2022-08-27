@@ -19,13 +19,14 @@ import {LoupGarou} from "../entity/roles/LoupGarou";
 import {HUD} from "../entity/Displayables/HUD";
 import {Blood} from "../entity/Displayables/Props/Blood";
 import {Box} from "../entity/Displayables/Props/Box";
-import { Bush } from '../entity/Displayables/Props/Bush';
+import {Bush} from '../entity/Displayables/Props/Bush';
 import {Fork} from "../entity/Displayables/Props/Fork";
 import {House} from "../entity/Displayables/Props/House";
 import {PineTree} from "../entity/Displayables/Props/PineTree";
 import {Tree} from "../entity/Displayables/Props/Tree";
 import {TreeStump} from "../entity/Displayables/Props/TreeStump";
 import {Config} from "../entity/Config";
+import Swal from "sweetalert2";
 
 // @ts-ignore
 const partie = _partie as Partie;
@@ -43,7 +44,7 @@ const numeroJoueur = _numeroJoueur as number;
 const LG = _LG as number[];
 
 Config.CONFIGURATION = new Config();
-Config.CONFIGURATION.env = (DEBUG)?"debug":"release";
+Config.CONFIGURATION.env = (DEBUG) ? "debug" : "release";
 
 const socket = io(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
 
@@ -173,8 +174,9 @@ $role.text(player.toString());
 $("#description_role").html(player.getDescription());
 $get_role.on("click", ()=> {$get_role.hide(1000);});
 setTimeout(()=> {$get_role.hide(1);}, 10_000);
-let night = true;
-let voteDisponible = false;
+let night = true,
+    voteDisponible = false,
+    chasseur_kill = false;
 
 async function init(){
 
@@ -209,7 +211,7 @@ async function init(){
     }
 
     function addRemotePlayer(data: {id: number, position: Coordinate, index: number, color: UserColor, pseudo: string, role: Roles}): Player {
-        if(!data.role) return;
+        //if(!data.role) return;
         if(getPlayerById(data.id)) return;
         let remotePlayer;
 
@@ -291,9 +293,7 @@ async function init(){
         if(data.id === user.id) return;
         let remotePlayer = getPlayerById(data.id);
         if (!remotePlayer) remotePlayer = addRemotePlayer(data);
-        if (!remotePlayer) return;
-        //remotePlayer.x = data.position.x - Player.defaultSize.w / 2;
-        //remotePlayer.y = data.position.y - Player.defaultSize.h / 2;
+        if (!remotePlayer) return console.log("bruh");
         remotePlayer.slideTo(data.position, player, MOVE_ANTISPAM_DURATION).then(() => {
             player.updateDistance(data.id);
         });
@@ -366,6 +366,7 @@ async function init(){
             anim.hide();
             $("#vote").show();
             voteDisponible = player.alive && !player.ghost;
+            chasseur_kill = player.role === Roles.Chasseur && !player.alive && !player.ghost && !(player as Chasseur).hasShot;
             create_players(players);
             night = false;
         },4000);
@@ -622,6 +623,16 @@ function set_player_vote(p) {
                 }
             });
         }
+    }
+    if (chasseur_kill && p.pid !== player.pid) {
+        const play = OTHER_PLAYERS.find(index => index.pid === p.pid);
+        button = $('<button class="kill">Tuer</button>');
+        button.on("click", function () {
+            if (player.action(play))
+                $(".kill").hide();
+            else Swal.fire("Impossible d'effectuer l'action");
+        });
+
     }
 
      item.append(html, name, role, button);

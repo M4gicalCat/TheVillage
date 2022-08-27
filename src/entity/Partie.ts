@@ -21,7 +21,7 @@ export class Partie {
 
     public static readonly NB_JOUEURS_MIN = 2;
     public static readonly NB_JOUEURS_MAX = 15;
-    public static readonly NB_TASKS_PER_DAY = 2;
+    public static readonly NB_TASKS_PER_DAY = 1;//2;
 
     @PrimaryColumn()
     id: string;

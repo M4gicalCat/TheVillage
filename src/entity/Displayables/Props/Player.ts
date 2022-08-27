@@ -302,7 +302,7 @@ export abstract class Player extends Displayable {
         ));
     }
 
-    abstract action(...params);
+    abstract action(...params): void | boolean;
 
     abstract checkAction(player: Player): boolean;
 

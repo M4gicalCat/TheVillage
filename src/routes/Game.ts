@@ -192,6 +192,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                     partie.addAction(data.data.maker,ActionType.REVEAL, data.data.player);
                     return socket.emit("see_role", {role: partie.roles.filter(p => p.uid === data.data.player)[0].role, id: data.data.player});
                 case Roles.Chasseur:
+                    // Même chose que pour le loup-garou
                 case Roles.LoupGarou:
                     partie.addAction(data.data.maker, ActionType.KILL, data.data.player);
                     partie.kill(data.data.player);

@@ -58,7 +58,7 @@ button {
     cursor: pointer;
 }
 
-.vote {
+.vote, .kill {
     height: 50px;
     width: 100px;
     align-items: center;
