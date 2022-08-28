@@ -203,15 +203,13 @@ export abstract class Player extends Displayable {
         if (!this.alive)
             this.image = this.getImg.next().value as HTMLImageElement;
         this.ctx.font = "10px sans-serif";
-        //this.ctx.fillStyle = "#f00";
-        //this.ctx.fillRect( this.getDrawnPosition().x, this.getDrawnPosition().y, this.size.w, this.size.h);
         this.ctx.drawImage(this.image, this.getDrawnPosition().x, this.getDrawnPosition().y, this.size.w, this.size.h);
         this.ctx.textAlign = "center";
 
-        if (!this.isLocal && this.role) {
+        if (!this.isLocal && this.role || this.role === 0) {
             this.ctx.font = "15px sans-serif";
             this.ctx.fillStyle = this.role === Roles.LoupGarou ? "red" : "blue";
-            this.ctx.fillText(this.toString(), this.getDrawnPosition().x + (this.size.w / 2), this.getDrawnPosition().y - 2);
+            this.ctx.fillText(Player.getRole(this.role), this.getDrawnPosition().x + (this.size.w / 2), this.getDrawnPosition().y - 2);
         }
         if(!this.isLocal){
             this.ctx.font = "22px sans-serif";
@@ -407,6 +405,17 @@ export abstract class Player extends Displayable {
 
     toString(): string {
         return "Rôle inconnu";
+    }
+
+    static getRole(role: Roles): string {
+        switch (role) {
+            case Roles.Sorciere: return "Sorcière";
+            case Roles.Chasseur: return "Chasseur";
+            case Roles.LoupGarou: return "Loup garou";
+            case Roles.Voyante: return "Voyante";
+            case Roles.Villageois: return "Villageois";
+            default: return "Rôle inconnu";
+        }
     }
 
     getDescription() {
