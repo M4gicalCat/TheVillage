@@ -1,4 +1,5 @@
 export enum AudioType {
     Kill,
-    Revive
+    Revive,
+    Voyante
 }

@@ -52,6 +52,7 @@ const socket = io(`${window.location.protocol === "https:" ? "wss" : "ws"}://${w
 const audio = {
     kill: new Audio("/audio/kill.m4a"),
     revive: new Audio("/audio/revive.mp3"),
+    voyante: new Audio("/audio/voyante.mp3"),
 };
 
 // @ts-ignore
@@ -319,16 +320,15 @@ async function init(){
             case AudioType.Revive:
                 sound = audio.revive;
                 break;
+            case AudioType.Voyante:
+                sound = audio.voyante;
+                break;
         }
         if (!sound) return;
         sound = sound.cloneNode(true);
         if (distance)
             sound.volume = (distance - distance_to_sound) / distance * 100;
-        sound.play().then(() => {
-            console.log("played");
-        }).catch(e => {
-            console.log(e)
-        });
+        sound.play();
     });
 
     socket.on("playerMove", (data) => {
