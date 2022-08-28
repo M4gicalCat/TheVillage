@@ -5,8 +5,9 @@ import {Roles} from "../types/Roles";
 
 export class LoupGarou extends Player {
     static readonly NB_POCHE_KILL = 1;
-    DISTANCE_FOR_ACTION = 300;
+    static readonly DISTANCE_SON_KILL = 1000;
     private pochesDeSang: number;
+    DISTANCE_FOR_ACTION = 300;
     constructor(ctx, environment, positonDraw: Coordinate, size, map, index) {
         super(ctx, environment, positonDraw, size, map, index);
         this.hasAction = true;
@@ -23,7 +24,7 @@ export class LoupGarou extends Player {
 
     action(player: Player) {
         if (!this.checkAction(player)) return;
-        this.emit("action", {player: player.pid});
+        this.emit("action", {player: player.pid, position: player.getPosition()});
         this.pochesDeSang -= LoupGarou.NB_POCHE_KILL;
     }
 

@@ -9,6 +9,9 @@ import {Roles} from "../entity/types/Roles";
 import {ActionType} from "../entity/types/ActionType";
 import {Config} from "../entity/Config";
 import {Coordinate} from "../entity/types/Coordinate";
+import {AudioType} from "../entity/types/AudioType";
+import {LoupGarou} from "../entity/roles/LoupGarou";
+import {Sorciere} from "../entity/roles/Sorciere";
 
 const passport = require("passport");
 
@@ -168,7 +171,6 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                 position: data.position,
                 index: data.index,
                 color: user.color,
-                role
             });
         });
 
@@ -187,6 +189,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                             return io.to(partie.id).emit("victoire", gagnant);
                         }
                     }
+                    io.to(partie.id).emit("audio", data.data.revive ? AudioType.Revive : AudioType.Kill, data.position, data.data.revive ? Sorciere.DISTANCE_SON_REVIVE : Sorciere.DISTANCE_SON_KILL);
                     return io.to(partie.id).emit(data.data.revive ? "revive" : "kill", data.data.player);
                 case Roles.Voyante:
                     partie.addAction(data.data.maker,ActionType.REVEAL, data.data.player);
@@ -201,6 +204,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                         return io.to(partie.id).emit("victoire", gagnant);
                     }
                     await partie.checkTasks(io);
+                    io.to(partie.id).emit("audio", AudioType.Kill, data.position, LoupGarou.DISTANCE_SON_KILL);
                     return io.to(partie.id).emit("kill", data.data.player);
             }
         });

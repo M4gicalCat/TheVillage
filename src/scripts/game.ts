@@ -27,6 +27,7 @@ import {Tree} from "../entity/Displayables/Props/Tree";
 import {TreeStump} from "../entity/Displayables/Props/TreeStump";
 import {Config} from "../entity/Config";
 import Swal from "sweetalert2";
+import {AudioType} from "../entity/types/AudioType";
 
 // @ts-ignore
 const partie = _partie as Partie;
@@ -47,6 +48,11 @@ Config.CONFIGURATION = new Config();
 Config.CONFIGURATION.env = (DEBUG) ? "debug" : "release";
 
 const socket = io(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}`);
+// Passer les audios en mp3 pour être sûr
+const audio = {
+    kill: new Audio("/audio/kill.m4a"),
+    revive: new Audio("/audio/revive.mp3"),
+};
 
 // @ts-ignore
 let game = _game;
@@ -179,7 +185,6 @@ let night = true,
     chasseur_kill = false;
 
 async function init(){
-
     if(map)
         await environment.create(ctx, map);
     else
@@ -281,12 +286,49 @@ async function init(){
 
     const MOVE_ANTISPAM_DURATION = 50;
     let moveAntiSpam = 0;
+
     player.on("move", () => {
         if(moveAntiSpam > Date.now()) return;
         moveAntiSpam = Date.now() + MOVE_ANTISPAM_DURATION;
         if (player.alive) {
             sendCurrentPosition();
         }
+    });
+
+    /**
+     * Joue un son
+     * @param type
+     * Le type de son à jouer
+     * @param position
+     * Optionnel
+     * @param distance
+     * Optionnel - Si précisé, l'audio n'est joué que si le joueur est éloigné de maximum <distance> de la source <position>
+     */
+    socket.on("audio", (type: AudioType, position?: Coordinate, distance?: number) => {
+        let distance_to_sound;
+        if (position) {
+            const pos = player.getPosition();
+            distance_to_sound = Math.sqrt((pos.x - position.x) ** 2 + (pos.y - position.y) ** 2);
+            if (distance_to_sound > distance) return;
+        }
+        let sound;
+        switch (type) {
+            case AudioType.Kill:
+                sound = audio.kill;
+                break;
+            case AudioType.Revive:
+                sound = audio.revive;
+                break;
+        }
+        if (!sound) return;
+        sound = sound.cloneNode(true);
+        if (distance)
+            sound.volume = (distance - distance_to_sound) / distance * 100;
+        sound.play().then(() => {
+            console.log("played");
+        }).catch(e => {
+            console.log(e)
+        });
     });
 
     socket.on("playerMove", (data) => {
