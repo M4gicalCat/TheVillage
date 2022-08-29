@@ -57,6 +57,15 @@ export function Route(router: Router) {
         });
    });
 
+    router.put("/options/son", async (req, res) => {
+        const {son} = req.body;
+        const user = req.user as User;
+        user.son = Number.parseInt(son);
+        if (isNaN(user.son)) return res.status(400).send("Valeur incorrecte");
+        await getRepository(User).save(user);
+        return res.status(200).send();
+    });
+
     router.put('/options/email', async (req, res) => {
         let password = req.body.password;
         let user = req.user as User

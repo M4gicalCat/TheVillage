@@ -11,23 +11,46 @@ import {Tools} from "../entity/Tools";
 let user = _user;
 let uid = user.id;
 
+const son_on = $("<i class='fas fa-volume-up color-green'></i>")
+const son_off = $("<i class='fas fa-volume-off color-red'></i>")
+const $icone_son = $('#icone_son');
+update_volume();
+$icone_son.on("click", () => {
+    user.son = user.son > 0 ? 0 : 100;
+    $("#son").val(user.son);
+    $.ajax('/options/son', {
+        method: "PUT",
+        data: {
+            son: user.son
+        }
+    })
+        .done(update_volume)
+        .catch(e => {
+        Swal.fire(e.responseJSON);
+    });
+});
+$("#son").on("change", e => {
+    user.son = +((e.target as HTMLInputElement).value);
+    $.ajax('/options/son', {
+        method: "PUT",
+        data: {
+            son: user.son
+        }
+    })
+        .done(update_volume)
+        .catch(e => {
+        Swal.fire(e.responseJSON);
+    });
+});
+
 $("#retour").on("click", () => {
     window.location.replace("/");
 });
 
-$("#son").on("click", () => {
-    let icon = $(this).children();
-   if($(icon).hasClass("fa-volume-up")) {
-       $(icon).removeClass("fa-volume-up").addClass("fa-volume-mute");
-       $(icon).removeClass("color-green").addClass("color-red");
-   } else {
-       $(icon).removeClass("fa-volume-mute").addClass("fa-volume-up");
-       $(icon).removeClass("color-red").addClass("color-green");
-   }
-});
-
-$("#changepassword").on("click", () => {
-    window.location.href = "../auth/getPassword?email="+$("#email").text();
+$("#changepassword").on("click", (e) => {
+    e.preventDefault();
+    Swal.fire({title: "L'envoi d'email est en travaux", text: "Vous devrez encore patienter un peu avant de pouvoir changer votre mot de passe.", icon: "info"});
+    //window.location.href = "../auth/getPassword?email="+$("#email").text();
 });
 
 $("#changeusername").on("click", async () => {
@@ -139,14 +162,22 @@ $("#changeavatar").on("click", async function() {
     }
 });
 
-//$("#changecouleuringame").on("click", async function() {
 
 let avatar = $(`#avatar_pic`);
 let html = "";
 html += user.avatar.startsWith("#")
     ? `<div id="avatar_color" class="avatar"></div>`
-    : `<img src="/avatars/${user.avatar}" width="80" alt=" ">`;
+    : `<img src="/avatars/${user.avatar}" width="50" alt=" ">`;
 html += `</div>`
 avatar.html(html);
 if (user.avatar.startsWith("#"))
     $("#avatar_color").css("background-color", user.avatar);
+
+
+function update_volume() {
+    if (user.son > 0) {
+        $icone_son.empty().append(son_on);
+    } else {
+        $icone_son.empty().append(son_off);
+    }
+}

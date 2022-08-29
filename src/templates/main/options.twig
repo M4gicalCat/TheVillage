@@ -1,40 +1,50 @@
 {% extends "body.twig" %}
 
-{% block title %}
-    Options
-{% endblock %}
+{% block title %}Options{% endblock %}
 
 {% block body %}
     <button class="retour" id="retour" type="button"><i class="fas fa-long-arrow-alt-left"></i></button>
-    <div class="grid">
-        <button id="son">
-            <i class="fas fa-volume-up color-green"></i>
-        </button>
+    <div class="container">
+        <h1>Options</h1>
+        <div class="grid">
+            <div class="group">
+                <div class="champ">
+                    <span id="avatar_pic"></span>
+                    <button id="changeavatar" title="Changer l'avatar" class="changement_information" type="button"><i class="fas fa-pen"></i></button>
+                </div>
 
-        <h1>Avatar</h1>
-        <span id="avatar"></span>
-        <span id="avatar_pic"></span>
-        <button id="changeavatar" class="changement_information" type="button">changer l'avatar</button>
-
-        <h1>Pseudo</h1>
-        <span id="pseudo">{{ user.pseudo }}</span>
-        <button id="changeusername" class="changement_information" type="button">changer le pseudo</button>
-
-        <h1>Adresse mail</h1>
-        <span id="email">{{ user.adresseMail }}</span>
-        <button id="changeemail" class="changement_information" type="button">changer l'adresse mail</button>
-
-        <h1>Mot de passe</h1>
-        <button id="changepassword" class="changement_information" type="button">changer le mot de passe</button>
+                <div class="champ">
+                    <span id="pseudo">{{ user.pseudo }}</span>
+                    <button id="changeusername" class="changement_information" title="Changer le pseudo" type="button"><i class="fas fa-pen"></i></button>
+                </div>
+            </div>
+            <div class="group">
+                <div class="champ">
+                    <button id="icone_son"></button>
+                    <input type="range" min="0" max="100" value="{{ user.son }}" id="son" aria-label="Volume" title="Modifiez le volume du jeu">
+                </div>
+            </div>
+            <div class="group">
+                <div class="champ">
+                    <span id="email">{{ user.adresseMail }}</span>
+                    <button id="changeemail" class="changement_information" type="button" title="Changer l'adresse mail"><i class="fas fa-pen"></i></button>
+                </div>
+                <div class="champ">
+                    <a id="changepassword" title="Changer le mot de passe" class="changement_information" href="/auth/getPassword?email={{ user.adresseMail }}">Changer le mot de passe</a>
+                </div>
+            </div>
+            </div>
     </div>
+    <span></span>
 {% endblock %}
 
 {% block javascripts %}
     <script>
         var _user = {
             id: {{ user.id }},
-            avatar: "{{ user.avatar }}"
-        }
+            avatar: "{{ user.avatar }}",
+            son: {{ user.son }},
+        };
     </script>
     <script src="/dist/options.js" type="text/javascript"></script>
 {% endblock %}

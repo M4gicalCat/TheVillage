@@ -31,6 +31,10 @@ export class User {
     @Column()
     adresseMail: string;
 
+    //Volume entre 0 et 100
+    @Column()
+    son: number;
+
     @Column({
         default: 1
     })
