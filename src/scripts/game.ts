@@ -306,6 +306,7 @@ async function init(){
      * Optionnel - Si précisé, l'audio n'est joué que si le joueur est éloigné de maximum <distance> de la source <position>
      */
     socket.on("audio", (type: AudioType, position?: Coordinate, distance?: number) => {
+        if (!user.son) return console.log("PAS DE SON");
         let distance_to_sound;
         if (position) {
             const pos = player.getPosition();
@@ -328,6 +329,7 @@ async function init(){
         sound = sound.cloneNode(true);
         if (distance)
             sound.volume = (distance - distance_to_sound) / distance * 100;
+        sound.volume *= user.son / 100;
         sound.play();
     });
 
