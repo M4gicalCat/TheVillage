@@ -2,6 +2,8 @@ import {Router} from "express";
 import {getLibs} from "../scripts/libs";
 import {User} from "../entity/User";
 import {getRepository} from "typeorm";
+import {DiskStorageOptions} from "multer";
+import {Skin} from "../entity/Skin";
 const multer  = require('multer');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -13,7 +15,7 @@ const storage = multer.diskStorage({
     limits: {
         fileSize: 5000000
     }
-});
+} as DiskStorageOptions);
 
 const upload = multer({ storage });
 const bcrypt = require('bcrypt');
@@ -29,7 +31,7 @@ export function Route(router: Router) {
         res.render('main/chargement');
     });
 
-    router.get('/options', (req, res) => {
+    router.get('/options',  (req, res) => {
         res.render('main/options', {
             user: req.user
         });
@@ -98,10 +100,32 @@ export function Route(router: Router) {
         res.redirect("/options");
     });
 
-    router.get('/profil', (req, res) => {
+    router.get('/profil', async (req, res) => {
         res.render('main/profil', {
-            user: req.user
+            user: (await getRepository(User).findOne((req.user as User).id, {relations: ["roles", "skins", "skin"]})),
         });
+    });
+
+    router.put("/profil/skin", async (req, res) => {
+        try {
+            const u = req.user as User;
+            console.log(u);
+            const repo = getRepository(User);
+            const {skins} = await repo.findOne(u.id, {relations: ["skins"]});
+            console.log(skins, req.body);
+            const skin = skins.find(s => s.id === +req.body.id);
+            console.log(skin);
+            if (!skin) {
+                return res.status(400).send("Vous ne possédez pas cette apparence");
+            }
+            u.skin = skin;
+            await repo.save(u);
+            return res.status(200).send();
+        } catch (e) {
+            console.log(e);
+            return res.status(400).send("aaa");
+        }
+
     });
 
     router.get("/credits", async(req, res) => {

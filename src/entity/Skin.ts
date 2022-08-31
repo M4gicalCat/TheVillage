@@ -12,7 +12,7 @@ export class Skin{
     lien: string;
 
     @Column()
-    nom: string;
+    name: string;
 
     @ManyToMany(() => User, user => user.skins)
     users: User[];
@@ -30,7 +30,7 @@ export class Skin{
         let users;
 
         const blanc = skins.splice(skins.findIndex(s => s.id === SkinId.Blanc), 1)[0] ?? new Skin();
-        blanc.nom = "Villageois blanc";
+        blanc.name = "Villageois blanc";
         blanc.lien = "blanc";
         blanc.price = 0;
         blanc.id = SkinId.Blanc;
@@ -41,7 +41,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.Blanc);
 
         const bleu = skins.splice(skins.findIndex(s => s.id === SkinId.Bleu), 1)[0] ?? new Skin();
-        bleu.nom = "Villageois bleu";
+        bleu.name = "Villageois bleu";
         bleu.lien = "bleu";
         bleu.price = 0;
         bleu.id = SkinId.Bleu;
@@ -52,7 +52,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.Bleu);
 
         const bleu_clair = skins.splice(skins.findIndex(s => s.id === SkinId.BleuClair), 1)[0] ?? new Skin();
-        bleu_clair.nom = "Villageois bleu clair";
+        bleu_clair.name = "Villageois bleu clair";
         bleu_clair.lien = "bleu_clair";
         bleu_clair.price = 0;
         bleu_clair.id = SkinId.BleuClair;
@@ -63,7 +63,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.BleuClair);
 
         const gris = skins.splice(skins.findIndex(s => s.id === SkinId.Gris), 1)[0] ?? new Skin();
-        gris.nom = "Villageois gris";
+        gris.name = "Villageois gris";
         gris.lien = "gris";
         gris.price = 0;
         gris.id = SkinId.Gris;
@@ -74,7 +74,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.Gris);
 
         const jaune = skins.splice(skins.findIndex(s => s.id === SkinId.Jaune), 1)[0] ?? new Skin();
-        jaune.nom = "Villageois jaune";
+        jaune.name = "Villageois jaune";
         jaune.lien = "jaune";
         jaune.price = 0;
         jaune.id = SkinId.Jaune;
@@ -85,7 +85,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.Jaune);
 
         const orange = skins.splice(skins.findIndex(s => s.id === SkinId.Orange), 1)[0] ?? new Skin();
-        orange.nom = "Villageois orange";
+        orange.name = "Villageois orange";
         orange.lien = "orange";
         orange.price = 0;
         orange.id = SkinId.Orange;
@@ -96,7 +96,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.Orange);
 
         const rose = skins.splice(skins.findIndex(s => s.id === SkinId.Rose), 1)[0] ?? new Skin();
-        rose.nom = "Villageois rose";
+        rose.name = "Villageois rose";
         rose.lien = "rose";
         rose.price = 0;
         rose.id = SkinId.Rose;
@@ -107,7 +107,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.Rose);
 
         const rouge = skins.splice(skins.findIndex(s => s.id === SkinId.Rouge), 1)[0] ?? new Skin();
-        rouge.nom = "Villageois rouge";
+        rouge.name = "Villageois rouge";
         rouge.lien = "rouge";
         rouge.price = 0;
         rouge.id = SkinId.Rouge;
@@ -118,7 +118,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.Rouge);
 
         const vert = skins.splice(skins.findIndex(s => s.id === SkinId.Vert), 1)[0] ?? new Skin();
-        vert.nom = "Villageois vert";
+        vert.name = "Villageois vert";
         vert.lien = "vert";
         vert.price = 0;
         vert.id = SkinId.Vert;
@@ -129,7 +129,7 @@ export class Skin{
             await repo.createQueryBuilder().relation(User, "skins").of(users).add(SkinId.Vert);
 
         const vert_clair = skins.splice(skins.findIndex(s => s.id === SkinId.VertClair), 1)[0] ?? new Skin();
-        vert_clair.nom = "Villageois vert clair";
+        vert_clair.name = "Villageois vert clair";
         vert_clair.lien = "vert_clair";
         vert_clair.price = 0;
         vert_clair.id = SkinId.VertClair;

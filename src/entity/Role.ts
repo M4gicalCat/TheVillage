@@ -9,7 +9,7 @@ export class Role {
     @PrimaryColumn()
     role: Roles;
 
-    // Le nom du rôle
+    // Le name du rôle
     @Column()
     name: string;
 
