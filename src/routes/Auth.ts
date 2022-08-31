@@ -76,7 +76,11 @@ export function Route(router: Router) {
             user.skins = skins;
             user.skin = skins[Math.floor(Math.random() * skins.length)];
             user.partie = "";
-            user.avatar = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+            //user.avatar = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+            user.avatar = `#`;
+            for (let i = 0; i < 6; i++) {
+                user.avatar += ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'][Math.floor(Math.random() * 16)];
+            }
 
             user.roles = await getRepository(Role).createQueryBuilder("role")
                 .where("role = :villageois", {villageois: Roles.Villageois})

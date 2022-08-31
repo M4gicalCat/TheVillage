@@ -75,3 +75,12 @@ h1 {
 button:hover {
     cursor: pointer;
 }
+
+#argent {
+    font-size: 2rem;
+}
+
+#argent img {
+    height: 2rem;
+    width: 2rem;
+}
