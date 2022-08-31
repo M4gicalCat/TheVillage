@@ -7,7 +7,7 @@ import {Environment} from "../entity/Environment";
 import {PlayerMove} from "../entity/types/PlayerMove";
 import {io} from "socket.io-client";
 import {Partie} from "../entity/Partie";
-import {User, UserColor} from "../entity/User";
+import {User} from "../entity/User";
 import {Coordinate} from "../entity/types/Coordinate";
 import {Villageois} from "../entity/roles/Villageois";
 import {Map} from "../entity/Map";
@@ -160,21 +160,6 @@ player.setCord({
     y : -(canvas.height-Player.defaultSize.h) / 2
 });
 
-//player.color = user.color;
-/*player.imgL1 = document.createElement("img");
-player.imgL1.src = "/img/Bonhomme-2/Bonhomme2-"+user.color+"-L.png";
-player.imgR1 = document.createElement("img");
-player.imgR1.src = "/img/Bonhomme-2/Bonhomme2-"+user.color+".png";
-player.imgL2 = document.createElement("img");
-player.imgL2.src = "/img/Bonhomme-1/Bonhomme1-"+user.color+"-L.png";
-player.imgR2 = document.createElement("img");
-player.imgR2.src = "/img/Bonhomme-1/Bonhomme1-"+user.color+".png";
-player.imgL3 = document.createElement("img");
-player.imgL3.src = "/img/Bonhomme-3/Bonhomme3-"+user.color+"-L.png";
-player.imgR3 = document.createElement("img");
-player.imgR3.src = "/img/Bonhomme-3/Bonhomme3-"+user.color+".png";
-player.image = player.getImg.next().value as HTMLImageElement;*/
-
 player.imgL1 = document.createElement("img");
 player.imgL1.src = `/skins/${user.skin.lien}/1L.png`;
 player.imgR1 = document.createElement("img");
@@ -233,7 +218,6 @@ async function init(){
     }
 
     function addRemotePlayer(data: {id: number, position: Coordinate, index: number, skin: Skin, pseudo: string, role: Roles}): Player {
-        //if(!data.role) return;
         if(getPlayerById(data.id)) return;
         let remotePlayer;
 
@@ -262,19 +246,7 @@ async function init(){
         OTHER_PLAYERS.push(remotePlayer);
         player.addOtherPlayer(remotePlayer);
         environment.addToLayer(100, remotePlayer);
-        remotePlayer.role = LG.includes(remotePlayer.pid) ? Roles.LoupGarou : null;/*
-        remotePlayer.imgL1 = document.createElement("img");
-        remotePlayer.imgL1.src = "/img/Bonhomme-2/Bonhomme2-"+remotePlayer.color+"-L.png";
-        remotePlayer.imgR1 = document.createElement("img");
-        remotePlayer.imgR1.src = "/img/Bonhomme-2/Bonhomme2-"+remotePlayer.color+".png";
-        remotePlayer.imgL2 = document.createElement("img");
-        remotePlayer.imgL2.src = "/img/Bonhomme-1/Bonhomme1-"+remotePlayer.color+"-L.png";
-        remotePlayer.imgR2 = document.createElement("img");
-        remotePlayer.imgR2.src = "/img/Bonhomme-1/Bonhomme1-"+remotePlayer.color+".png";
-        remotePlayer.imgL3 = document.createElement("img");
-        remotePlayer.imgL3.src = "/img/Bonhomme-3/Bonhomme3-"+remotePlayer.color+"-L.png";
-        remotePlayer.imgR3 = document.createElement("img");
-        remotePlayer.imgR3.src = "/img/Bonhomme-3/Bonhomme3-"+remotePlayer.color+".png";*/
+        remotePlayer.role = LG.includes(remotePlayer.pid) ? Roles.LoupGarou : null;
 
         remotePlayer.imgL1 = document.createElement("img");
         remotePlayer.imgL1.src = `/skins/${data.skin.lien}/1L.png`;

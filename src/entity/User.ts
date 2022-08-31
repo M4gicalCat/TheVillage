@@ -3,7 +3,7 @@ import {Skin} from "./Skin";
 import {Succes} from "./Succes";
 import {Role} from "./Role";
 
-export enum UserColor {
+/*export enum UserColor {
     blanc = "blanc",
     bleu = "bleu",
     bleu_clair = "bleu_clair",
@@ -14,7 +14,7 @@ export enum UserColor {
     rouge = "rouge",
     vert = "vert",
     vert_clair = "vert_clair"
-}
+}*/
 
 @Entity()
 export class User {

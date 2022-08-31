@@ -4,7 +4,6 @@ import {Coordinate} from "../../types/Coordinate";
 import {Map} from "../../Map";
 import {Roles} from "../../types/Roles";
 import {ObjectType} from "../../types/ObjectType";
-import {UserColor} from "../../User";
 import {Config} from "../../Config";
 
 export abstract class Player extends Displayable {
@@ -40,7 +39,6 @@ export abstract class Player extends Displayable {
     abstract DISTANCE_FOR_ACTION: number;
     playerForAction: Player;
     private readonly sliders: number[];
-    color: UserColor;
     vote: boolean;
 
     public x;
@@ -80,7 +78,7 @@ export abstract class Player extends Displayable {
         this.environment.setCord({ x: this.getPosition().x + (canvas.width / 2) + (this.size.h / 2), y: this.getPosition().y + (canvas.height / 2) + (this.size.w / 2) });
     }
 
-    initRemote(pid: number, cord: Coordinate, localPlayer: Player, canvas: HTMLCanvasElement) {
+    initRemote(pid: number, cord: Coordinate) {
         this.isLocal = false;
         this.pid = pid;
         this.setCord(cord);
