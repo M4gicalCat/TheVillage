@@ -16,6 +16,7 @@ import logger = require("node-color-log");
 import * as session from "express-session";
 import {RememberMeToken} from "./entity/RememberMeToken";
 import {Role} from "./entity/Role";
+import {Skin} from "./entity/Skin";
 
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -48,6 +49,7 @@ createConnection().then(async () => {
     logger.info("Connected to database !");
 
     await Role.init();
+    await Skin.init();
 
     logger.info("Creating Web Server...");
     const app: Express = express();

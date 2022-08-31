@@ -24,6 +24,10 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
         if(!partie) return next();
         if (partie.status === PartieStatus.ENDED) return res.redirect("/");
         const user = req.user as User;
+        const u = await getRepository(User).findOne(user.id, {relations: ["skin"]});
+        for (const prop in u) {
+            if (u[prop]) user[prop] = u[prop];
+        }
         if (partie.status > PartieStatus.STARTING) {
             const p = findPartie(partie.id);
             if (p) {
@@ -61,7 +65,6 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
         let users = [];
         for (let p of players) {
             let u = await getRepository(User).findOne(p.id);
-            p.color = u.color;
             users.push(u);
         }
         io.to(roomId).emit("players", users);
@@ -118,12 +121,12 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
         return null;
     }
 
-    io.on("connection", (socket) => {
+    io.on("connection", async (socket) => {
 
         let partie: Partie,
-            user: User = socket.request["user"],
+            user: User = await getRepository(User).findOne(socket.request["user"].id, {relations: ["skin"]}),
             position: Coordinate,
-            role: Roles
+            role: Roles;
 
         function sendError(msg: string) {
             socket.emit("error", {
@@ -150,7 +153,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                 pseudo: user.pseudo,
                 position: data.position,
                 index: data.index,
-                color: data.color,
+                skin: data.skin,
                 role
             });
             partie.status = PartieStatus.STARTED;
@@ -170,7 +173,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                 pseudo: user.pseudo,
                 position: data.position,
                 index: data.index,
-                color: user.color,
+                skin: {lien: user.skin.lien},
             });
         });
 

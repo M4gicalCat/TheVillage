@@ -8,6 +8,7 @@ import {RecuperationEmail} from "../entity/RecuperationEmail";
 import {RememberMeToken} from "../entity/RememberMeToken";
 import {Role} from "../entity/Role";
 import {Roles} from "../entity/types/Roles";
+import {Skin} from "../entity/Skin";
 const passport = require("passport");
 const bcrypt = require('bcrypt');
 //pour hash le mdp
@@ -43,7 +44,7 @@ export function Route(router: Router) {
     });
 
     router.post("/auth/verifInscription", (req, res) => {
-        const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
+        const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
         req.body.password2 ??= "";
         if (
             req.body.password !== req.body.password2 ||
@@ -51,29 +52,31 @@ export function Route(router: Router) {
             /<|>| |'|"|`/g.test(req.body.pseudo) ||
             !(email_regex.test(req.body.mail))
         ) {
-            return res.redirect(`/auth/inscription?missed=1&pseudo=${/"/g.test(req.body.pseudo) ? "" : req.body.pseudo}&mail=${req.body.mail}`)
+            return res.redirect(`/auth/inscription?missed=1&pseudo=${/"/g.test(req.body.pseudo) ? "" : req.body.pseudo}&mail=${req.body.mail}`);
         }
 
         bcrypt.hash(req.body.password, saltRounds, async (err, hash) =>{
 
             if (err){
-                console.log(err)
-                return res.redirect("/auth/inscription?erreur=1")
+                console.error(err);
+                return res.redirect("/auth/inscription?erreur=1");
             }
 
-            const repo = getRepository(User)
-            let u = await repo.find({adresseMail: req.body.mail})
+            const repo = getRepository(User);
+            let u = await repo.find({adresseMail: req.body.mail});
             if (u.length !== 0){
-                return res.redirect(`/auth/inscription?erreur=2&pseudo=${req.body.pseudo}&mail=${req.body.mail}`)
+                return res.redirect(`/auth/inscription?erreur=2&pseudo=${req.body.pseudo}&mail=${req.body.mail}`);
             }
+            const skins = await getRepository(Skin).find({where: {price: 0}});
             let user = new User();
             user.pseudo = req.body.pseudo;
             user.password = hash;
             user.adresseMail = req.body.mail;
             user.succes = [];
-            user.skins = [];
+            user.skins = skins;
+            user.skin = skins[Math.floor(Math.random() * skins.length)];
             user.partie = "";
-            user.avatar = `#${Math.floor(Math.random()*16777215).toString(16)}`;
+            user.avatar = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
             user.roles = await getRepository(Role).createQueryBuilder("role")
                 .where("role = :villageois", {villageois: Roles.Villageois})

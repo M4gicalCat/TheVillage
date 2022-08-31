@@ -46,7 +46,9 @@ export class Role {
         villageois.name = "Villageois";
         villageois.limite = Partie.NB_JOUEURS_MAX;
         await repo.save(villageois);
-        await repo.createQueryBuilder().relation(User, "roles").of(relations.find(r => r.role === Roles.Villageois).users).add(Roles.Villageois);
+        let users = relations.find(r => r.role === Roles.Villageois)?.users;
+        if (users)
+            await repo.createQueryBuilder().relation(User, "roles").of(users).add(Roles.Villageois);
 
         let chasseur = roles.splice(roles.findIndex(r => r.role === Roles.Chasseur), 1)[0];
         if (!chasseur)
@@ -58,7 +60,9 @@ export class Role {
         chasseur.name = "Chasseur";
         chasseur.limite = 1;
         await repo.save(chasseur);
-        await repo.createQueryBuilder().relation(User, "roles").of(relations.find(r => r.role === Roles.Chasseur).users).add(Roles.Chasseur);
+        users = relations.find(r => r.role === Roles.Chasseur)?.users;
+        if (users)
+            await repo.createQueryBuilder().relation(User, "roles").of(users).add(Roles.Chasseur);
 
         let loupGarou = roles.splice(roles.findIndex(r => r.role === Roles.LoupGarou), 1)[0];
         if (!loupGarou)
@@ -70,7 +74,9 @@ export class Role {
         loupGarou.name = "Loup-Garou";
         loupGarou.limite = Partie.NB_JOUEURS_MAX;
         await repo.save(loupGarou);
-        await repo.createQueryBuilder().relation(User, "roles").of(relations.find(r => r.role === Roles.LoupGarou).users).add(Roles.LoupGarou);
+        users = relations.find(r => r.role === Roles.LoupGarou)?.users;
+        if (users)
+            await repo.createQueryBuilder().relation(User, "roles").of(users).add(Roles.LoupGarou);
 
         let sorciere = roles.splice(roles.findIndex(r => r.role === Roles.Sorciere), 1)[0];
         if (!sorciere)
@@ -82,7 +88,9 @@ export class Role {
         sorciere.name = "Sorcière";
         sorciere.limite = 1;
         await repo.save(sorciere);
-        await repo.createQueryBuilder().relation(User, "roles").of(relations.find(r => r.role === Roles.Sorciere).users).add(Roles.Sorciere);
+        users = relations.find(r => r.role === Roles.Sorciere)?.users;
+        if (users)
+            await repo.createQueryBuilder().relation(User, "roles").of(users).add(Roles.Sorciere);
 
         let voyante = roles.splice(roles.findIndex(r => r.role === Roles.Voyante), 1)[0];
         if (!voyante)
@@ -94,6 +102,8 @@ export class Role {
         voyante.name = "Voyante";
         voyante.limite = 1;
         await repo.save(voyante);
-        await repo.createQueryBuilder().relation(User, "roles").of(relations.find(r => r.role === Roles.Voyante).users).add(Roles.Voyante);
+        users = relations.find(r => r.role === Roles.Voyante)?.users;
+        if (users)
+            await repo.createQueryBuilder().relation(User, "roles").of(users).add(Roles.Voyante);
     }
 }

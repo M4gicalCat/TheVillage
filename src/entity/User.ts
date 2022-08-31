@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable} from "typeorm";
+import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne} from "typeorm";
 import {Skin} from "./Skin";
 import {Succes} from "./Succes";
 import {Role} from "./Role";
@@ -70,18 +70,17 @@ export class User {
     @Column()
     avatar: string;
 
-    @Column({
-        default: UserColor.gris
-    })
-    color: UserColor;
+    @ManyToOne(() => Skin)
+    skin: Skin;
 
     @ManyToMany(() => Succes)
     @JoinTable()
     succes: Succes[];
 
-    @ManyToMany(() => Skin)
+    @ManyToMany(() => Skin, skin => skin.users)
     @JoinTable()
     skins: Skin[];
+
     @ManyToMany(() => Role, role => role.users)
     @JoinTable()
     roles: Role[];
