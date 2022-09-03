@@ -17,6 +17,7 @@ import * as session from "express-session";
 import {RememberMeToken} from "./entity/RememberMeToken";
 import {Role} from "./entity/Role";
 import {Skin} from "./entity/Skin";
+import {Recompense} from "./entity/Recompense";
 
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -50,6 +51,7 @@ createConnection().then(async () => {
 
     await Role.init();
     await Skin.init();
+    await Recompense.init();
 
     logger.info("Creating Web Server...");
     const app: Express = express();

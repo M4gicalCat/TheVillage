@@ -1,7 +1,8 @@
-import {Column, Entity, getRepository, ManyToMany, PrimaryColumn} from "typeorm";
+import {Column, Entity, getRepository, ManyToMany, ManyToOne, PrimaryColumn} from "typeorm";
 import {Roles} from "./types/Roles";
 import {User} from "./User";
 import {Partie} from "./Partie";
+import {Recompense} from "./Recompense";
 
 @Entity()
 export class Role {
@@ -27,6 +28,9 @@ export class Role {
     // Les utilisateurs possédant ce rôle
     @ManyToMany(() => User, user => user.roles, {cascade: true})
     users: User[];
+
+    @ManyToOne(() => Recompense, r => r.roles)
+    recompense: Recompense;
 
     /**
      * Creates (or updates) the different roles available.

@@ -1,11 +1,12 @@
-import {Entity, PrimaryColumn, Column, ManyToMany, getRepository} from "typeorm";
+import {Entity, PrimaryColumn, Column, ManyToMany, getRepository, ManyToOne} from "typeorm";
 import {User} from "./User";
 import {SkinId} from "./types/SkinId";
+import {Recompense} from "./Recompense";
 
 @Entity()
 export class Skin{
     @PrimaryColumn()
-    id: number;
+    id: SkinId;
 
     // lien vers le repertoire contenant toutes les images.
     @Column()
@@ -20,6 +21,12 @@ export class Skin{
     @Column()
     price: number;
 
+    @Column()
+    purchasable: boolean;
+
+    @ManyToOne(() => Recompense, r => r.skins)
+    recompense: Recompense;
+
     /**
      * Méthode appelée une fois afin de créer/modifier tous les skins dans la db
      */
@@ -32,7 +39,8 @@ export class Skin{
         const blanc = skins.splice(skins.findIndex(s => s.id === SkinId.Blanc), 1)[0] ?? new Skin();
         blanc.name = "Villageois blanc";
         blanc.lien = "blanc";
-        blanc.price = 0;
+        blanc.price = 1;
+        blanc.purchasable = false;
         blanc.id = SkinId.Blanc;
         blanc.users = [];
         await repo.save(blanc);
@@ -43,7 +51,8 @@ export class Skin{
         const bleu = skins.splice(skins.findIndex(s => s.id === SkinId.Bleu), 1)[0] ?? new Skin();
         bleu.name = "Villageois bleu";
         bleu.lien = "bleu";
-        bleu.price = 0;
+        bleu.price = 1;
+        bleu.purchasable = false;
         bleu.id = SkinId.Bleu;
         bleu.users = [];
         await repo.save(bleu);
@@ -54,7 +63,8 @@ export class Skin{
         const bleu_clair = skins.splice(skins.findIndex(s => s.id === SkinId.BleuClair), 1)[0] ?? new Skin();
         bleu_clair.name = "Villageois bleu clair";
         bleu_clair.lien = "bleu_clair";
-        bleu_clair.price = 0;
+        bleu_clair.price = 1;
+        bleu_clair.purchasable = false;
         bleu_clair.id = SkinId.BleuClair;
         bleu_clair.users = [];
         await repo.save(bleu_clair);
@@ -66,6 +76,7 @@ export class Skin{
         gris.name = "Villageois gris";
         gris.lien = "gris";
         gris.price = 0;
+        gris.purchasable = false;
         gris.id = SkinId.Gris;
         gris.users = [];
         await repo.save(gris);
@@ -76,7 +87,8 @@ export class Skin{
         const jaune = skins.splice(skins.findIndex(s => s.id === SkinId.Jaune), 1)[0] ?? new Skin();
         jaune.name = "Villageois jaune";
         jaune.lien = "jaune";
-        jaune.price = 0;
+        jaune.price = 1;
+        jaune.purchasable = false;
         jaune.id = SkinId.Jaune;
         jaune.users = [];
         await repo.save(jaune);
@@ -87,7 +99,8 @@ export class Skin{
         const orange = skins.splice(skins.findIndex(s => s.id === SkinId.Orange), 1)[0] ?? new Skin();
         orange.name = "Villageois orange";
         orange.lien = "orange";
-        orange.price = 0;
+        orange.price = 1;
+        orange.purchasable = false;
         orange.id = SkinId.Orange;
         orange.users = [];
         await repo.save(orange);
@@ -98,7 +111,8 @@ export class Skin{
         const rose = skins.splice(skins.findIndex(s => s.id === SkinId.Rose), 1)[0] ?? new Skin();
         rose.name = "Villageois rose";
         rose.lien = "rose";
-        rose.price = 0;
+        rose.price = 1;
+        rose.purchasable = false;
         rose.id = SkinId.Rose;
         rose.users = [];
         await repo.save(rose);
@@ -109,7 +123,8 @@ export class Skin{
         const rouge = skins.splice(skins.findIndex(s => s.id === SkinId.Rouge), 1)[0] ?? new Skin();
         rouge.name = "Villageois rouge";
         rouge.lien = "rouge";
-        rouge.price = 0;
+        rouge.price = 1;
+        rouge.purchasable = false;
         rouge.id = SkinId.Rouge;
         rouge.users = [];
         await repo.save(rouge);
@@ -120,7 +135,8 @@ export class Skin{
         const vert = skins.splice(skins.findIndex(s => s.id === SkinId.Vert), 1)[0] ?? new Skin();
         vert.name = "Villageois vert";
         vert.lien = "vert";
-        vert.price = 0;
+        vert.price = 1;
+        vert.purchasable = false;
         vert.id = SkinId.Vert;
         vert.users = [];
         await repo.save(vert);
@@ -131,7 +147,8 @@ export class Skin{
         const vert_clair = skins.splice(skins.findIndex(s => s.id === SkinId.VertClair), 1)[0] ?? new Skin();
         vert_clair.name = "Villageois vert clair";
         vert_clair.lien = "vert_clair";
-        vert_clair.price = 0;
+        vert_clair.price = 1;
+        vert_clair.purchasable = false;
         vert_clair.id = SkinId.VertClair;
         vert_clair.users = [];
         await repo.save(vert_clair);
