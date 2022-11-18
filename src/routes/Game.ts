@@ -41,7 +41,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                     t.tasks = [];
                     await p.checkTasks(io);
                 }
-                const winner = await p.victoire();
+                const winner = await p.victoire(io);
                 if (winner !== null) {
                     io.to(partie.id).emit("victoire", winner);
                 }
@@ -122,6 +122,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
     }
 
     io.on("connection", async (socket) => {
+        socket.join(`pid_${socket.request["user"].id}`);
 
         let partie: Partie,
             user: User = await getRepository(User).findOne(socket.request["user"].id, {relations: ["skin"]}),
@@ -187,7 +188,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                     else {
                         partie.kill(data.data.player);
                         await partie.checkTasks(io);
-                        let gagnant = await partie.victoire();
+                        let gagnant = await partie.victoire(io);
                         if (gagnant !== null) {
                             return io.to(partie.id).emit("victoire", gagnant);
                         }
@@ -203,7 +204,7 @@ export function Route(router: Router, io: SocketIOServer, sessionMiddleware: Req
                 case Roles.LoupGarou:
                     partie.addAction(data.data.maker, ActionType.KILL, data.data.player);
                     partie.kill(data.data.player);
-                    let gagnant = await partie.victoire();
+                    let gagnant = await partie.victoire(io);
                     if (gagnant !== null) {
                         return io.to(partie.id).emit("victoire", gagnant);
                     }

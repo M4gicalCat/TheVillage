@@ -1,4 +1,4 @@
-import {Column, Entity, getRepository, PrimaryColumn} from "typeorm";
+import {Column, Entity, getRepository, In, PrimaryColumn} from "typeorm";
 
 import {User} from "./User";
 import {Map as Carte} from "./Map";
@@ -7,6 +7,7 @@ import {Action} from "./Action";
 import {ActionType} from "./types/ActionType";
 import {ObjectType} from "./types/ObjectType";
 import {Role} from "./Role";
+import {Recompense} from "./Recompense";
 
 export enum PartieStatus {
     CREATING,
@@ -21,7 +22,7 @@ export class Partie {
 
     public static readonly NB_JOUEURS_MIN = 2;
     public static readonly NB_JOUEURS_MAX = 15;
-    public static readonly NB_TASKS_PER_DAY = 1;//2;
+    public static readonly NB_TASKS_PER_DAY = 2;
 
     @PrimaryColumn()
     id: string;
@@ -266,12 +267,13 @@ export class Partie {
     }
 
     /**
+     * @param io
      * Checks for a victory :
      * @returns - `null` if no one wins (yet) |
      * @returns - `true` if the Villagers win |
      * @returns - `false` if the WereWolves win.
      */
-    async victoire(): Promise<null | boolean> {
+    async victoire(io): Promise<null | boolean> {
         const alive = this.inGamePlayers.filter(p => !this.deadPlayers.includes(p));
         let camp = null;
         for (const player of alive) {
@@ -286,7 +288,7 @@ export class Partie {
         // Tout le monde est dans le même camp, victoire d'un des camps
         this.status = PartieStatus.ENDED;
         await getRepository(Partie).save(this);
-        await this.assignXP(!camp);
+        await this.assignXP(!camp, io);
         return !camp;
     }
 
@@ -331,7 +333,7 @@ export class Partie {
                 io.to(this.id).emit("final_kill", this.deadPlayers);
             }
             this.votes = [];
-            const gagnant = await this.victoire();
+            const gagnant = await this.victoire(io);
             if (gagnant !== null) {
                 return io.to(this.id).emit("victoire", gagnant);
             }
@@ -341,18 +343,20 @@ export class Partie {
         }
     }
 
-    //true = villager win, false = werewolves win
     /**
      * Grants exp to every player in the game.
      * Grants more exp if the player won than if the player lost the game.
      * It also adds `1` to player.nbPartiesJouees or player.nbPartieGagnees (depending on the win / loss of the game).
-     * @param winner
+     * @param winner {boolean}
+     * true: Villagers won the game
+     * false: Werewolves won the game
+     * @param io
      */
-    async assignXP(winner) {
+    async assignXP(winner, io) {
         const uRepo = getRepository(User);
         for (const p of this.inGamePlayers) {
             const role = this.roles.find(r => r.uid === p);
-            const user = await uRepo.findOne(p);
+            const user = await uRepo.findOne(p, {relations: ["roles", 'skins']});
             if (!user) continue;
             if (!role) {
                 user.xp += 50;
@@ -368,10 +372,37 @@ export class Partie {
                 }
             }
             user.nbPartiesJouees++;
-            if (user.xp >= (user.niveau + 1) * 10) {
+            const last_level = user.niveau,
+                last_gold = user.argent;
+            const lvls = [];
+            while (user.xp >= (user.niveau + 1) * 10) {
                 user.niveau += 1;
                 user.xp -= (user.niveau) * 10;
+                user.argent += Math.floor((user.niveau % 10) + 1);
+                lvls.push(user.niveau);
             }
+            if (lvls.length > 0) {
+                const recompenses = await getRepository(Recompense).find({
+                    where: {niveau: In(lvls)},
+                    relations: ["roles", "skins"]
+                });
+                const skins = [];
+                const roles = [];
+                for (const r of recompenses) {
+                    user.argent += r.gold;
+                    user.skins.push(...r.skins);
+                    skins.push(...r.skins);
+                    user.roles.push(...r.roles);
+                    roles.push(...r.roles);
+                }
+                io.to(`pid_${user.id}`).emit("recompenses", {
+                    niveau: {last: last_level, new: user.niveau},
+                    gold: user.argent - last_gold,
+                    skins,
+                    roles,
+                });
+            }
+
             await uRepo.save(user);
         }
     }
