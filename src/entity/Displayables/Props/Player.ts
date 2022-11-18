@@ -5,6 +5,14 @@ import {Map} from "../../Map";
 import {Roles} from "../../types/Roles";
 import {ObjectType} from "../../types/ObjectType";
 import {Config} from "../../Config";
+import {Role} from "../../Role";
+import {Chasseur} from "../../roles/Chasseur";
+import {Sorciere} from "../../roles/Sorciere";
+import {Voyante} from "../../roles/Voyante";
+import {LoupGarou} from "../../roles/LoupGarou";
+import {Villageois} from "../../roles/Villageois";
+import {Environment} from "../../Environment";
+import {User} from "../../User";
 
 export abstract class Player extends Displayable {
 
@@ -63,6 +71,22 @@ export abstract class Player extends Displayable {
         this.initSpawn(map, index);
         this.sliders = [];
         this.vote = false;
+    }
+
+    initImages(lien: string) {
+        this.imgL1 = document.createElement("img");
+        this.imgL1.src = `/skins/${lien}/1L.png`;
+        this.imgR1 = document.createElement("img");
+        this.imgR1.src = `/skins/${lien}/1.png`;
+        this.imgL2 = document.createElement("img");
+        this.imgL2.src = `/skins/${lien}/2L.png`;
+        this.imgR2 = document.createElement("img");
+        this.imgR2.src = `/skins/${lien}/2.png`;
+        this.imgL3 = document.createElement("img");
+        this.imgL3.src = `/skins/${lien}/3L.png`;
+        this.imgR3 = document.createElement("img");
+        this.imgR3.src = `/skins/${lien}/3.png`;
+        this.image = this.getImg.next().value as HTMLImageElement;
     }
 
     initSpawn(map: Map, index) {

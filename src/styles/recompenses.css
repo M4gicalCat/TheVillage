@@ -11,8 +11,8 @@
 
 #recompenses_close {
     position: absolute;
-    right: 1.5rem;
-    bottom: .5rem;
+    top: calc(100vh - 7rem);
+    right: 5rem;
     padding: .5rem 1rem;
     background-color: #3A3A3A;
     color: white;

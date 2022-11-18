@@ -61,11 +61,13 @@ const audio = {
 let game = _game;
 let last_ms;
 
-let roomName = `${game.id}`,
+const roomName = `${game.id}`,
     messages = $('#messages'),
     sendMsg = $("#sendMessage"),
     input = $("#input"),
-    listeJoueurs = $("#players");
+    listeJoueurs = $("#players"),
+    $get_role = $("#get_role"),
+    $role = $("#role");
 
 const OTHER_PLAYERS: Player[] = [];
 
@@ -103,82 +105,22 @@ Player.deadimgL4 = document.createElement("img");
 Player.deadimgL4.src = `/img/dead4L.png`;
 Player.deadimgR4 = document.createElement("img");
 Player.deadimgR4.src = `/img/dead4R.png`;
-Blood.img = document.createElement("img");
-Blood.img.src = `/img/blood.png`;
-Box.image = document.createElement("img");
-Box.image.src = "/img/box.png";
-Bush.image = document.createElement("img");
-Bush.image.src = "/img/buisson.png";
-Fork.image = document.createElement("img");
-Fork.image.src = "/img/fourche.png";
-House.image = document.createElement("img");
-House.image.src = "/img/maison.png";
-PineTree.image = document.createElement("img");
-PineTree.image.src = "/img/sapin.png";
-Tree.image = document.createElement("img");
-Tree.image.src = "/img/arbre.png";
-TreeStump.image = document.createElement("img");
-TreeStump.image.src = "/img/tree_stump.png";
+initPropsImages();
 let ghostimg = document.createElement("img");
 ghostimg.src = `/img/fantome.png`;
 
-let player: Player;
-switch (role) {
-    case Roles.Chasseur :
-        player = new Chasseur(ctx, environment, {
-            x: map.players_spawn[numeroJoueur].x,
-            y: map.players_spawn[numeroJoueur].y
-        }, Player.defaultSize, map, numeroJoueur);
-        break;
-    case Roles.Sorciere:
-        player = new Sorciere(ctx, environment, {
-            x: map.players_spawn[numeroJoueur].x,
-            y: map.players_spawn[numeroJoueur].y
-        }, Player.defaultSize, map, numeroJoueur);
-        break;
-    case Roles.Voyante:
-        player = new Voyante(ctx, environment, {
-            x: map.players_spawn[numeroJoueur].x,
-            y: map.players_spawn[numeroJoueur].y
-        }, Player.defaultSize, map, numeroJoueur);
-        break;
-    case Roles.LoupGarou:
-        player = new LoupGarou(ctx, environment, {
-            x: map.players_spawn[numeroJoueur].x,
-            y: map.players_spawn[numeroJoueur].y
-        }, Player.defaultSize, map, numeroJoueur);
-        break;
-    default:
-        player = new Villageois(ctx, environment, {
-            x: map.players_spawn[numeroJoueur].x,
-            y: map.players_spawn[numeroJoueur].y
-        }, Player.defaultSize, map, numeroJoueur);
-        break;
-}
+let player = createPlayer(role, ctx, environment, numeroJoueur, map);
+
 player.pid = user.id;
 player.setCord({
     x : -(canvas.width-Player.defaultSize.w) / 2,
     y : -(canvas.height-Player.defaultSize.h) / 2
 });
 
-player.imgL1 = document.createElement("img");
-player.imgL1.src = `/skins/${user.skin.lien}/1L.png`;
-player.imgR1 = document.createElement("img");
-player.imgR1.src = `/skins/${user.skin.lien}/1.png`;
-player.imgL2 = document.createElement("img");
-player.imgL2.src = `/skins/${user.skin.lien}/2L.png`;
-player.imgR2 = document.createElement("img");
-player.imgR2.src = `/skins/${user.skin.lien}/2.png`;
-player.imgL3 = document.createElement("img");
-player.imgL3.src = `/skins/${user.skin.lien}/3L.png`;
-player.imgR3 = document.createElement("img");
-player.imgR3.src = `/skins/${user.skin.lien}/3.png`;
-player.image = player.getImg.next().value as HTMLImageElement;
+player.initImages(user.skin.lien);
 
 
 const player_hud = new HUD({canvas, player});
-const $get_role = $("#get_role");
-const $role = $("#role");
 $role.text(player.toString());
 $("#description_role").html(player.getDescription());
 $get_role.on("click", ()=> {$get_role.hide(1000);});
@@ -465,10 +407,10 @@ async function init(){
 
     socket.on("recompenses", ({niveau, gold, skins, roles}) => {
         $("#recompenses").removeAttr("hidden");
+        $("#titre_recompenses").text(`lvl.${niveau.last} -> lvl.${niveau.new}`);
         const recompenses = $("#affichage_recompenses");
         const affichage_gold = $("<div>").append($("<img src='/img/coin.png' width='25' alt=''>")).append($("<span>").text(gold));
-        const affichage_niveau = $("<div>").append($("<span>").text(`Niveau ${niveau.new}`));
-        recompenses.append(affichage_gold).append(affichage_niveau);
+        recompenses.append(affichage_gold);
         for (const s of skins) {
             recompenses.append(
                 $("<div>").append($(`<img src='/skins/${s.lien}/3.png' alt="" width="80">`)).append($("<span>").text(s.name))
@@ -611,7 +553,6 @@ const moveInterval = setInterval(() => {
         player.move(PlayerMove.moveNW, shift, diff);
 }, 1);
 
-
 function sendMessage() {
     if (player.alive) {
         if (input.val() && `${input.val()}`.trim() !== "") {
@@ -629,6 +570,10 @@ sendMsg.on("click", sendMessage);
 socket.on('message', (user, msg) => {
     create_message(user, msg);
     messages.scrollTop(messages[0].scrollHeight);
+});
+
+socket.on("disconnect", () => {
+    alert("vous êtes déconnecté");
 });
 
 function create_message(user, msg) {
@@ -734,4 +679,53 @@ function displayVictory(camp) {
     $endgame.css("visibility", "visible");
     $("#endGameTitle").text(`VICTOIRE : ${camp ? "VILLAGEOIS" : "LOUPS GAROUS"}`);
     socket.emit("history");
+}
+
+function initPropsImages() {
+    Blood.img = document.createElement("img");
+    Blood.img.src = `/img/blood.png`;
+    Box.image = document.createElement("img");
+    Box.image.src = "/img/box.png";
+    Bush.image = document.createElement("img");
+    Bush.image.src = "/img/buisson.png";
+    Fork.image = document.createElement("img");
+    Fork.image.src = "/img/fourche.png";
+    House.image = document.createElement("img");
+    House.image.src = "/img/maison.png";
+    PineTree.image = document.createElement("img");
+    PineTree.image.src = "/img/sapin.png";
+    Tree.image = document.createElement("img");
+    Tree.image.src = "/img/arbre.png";
+    TreeStump.image = document.createElement("img");
+    TreeStump.image.src = "/img/tree_stump.png";
+}
+
+function createPlayer(role: Roles, ctx: CanvasRenderingContext2D, environment: Environment, numeroJoueur: number, map: Map): Player {
+    switch (role) {
+        case Roles.Chasseur :
+            return new Chasseur(ctx, environment, {
+                x: map.players_spawn[numeroJoueur].x,
+                y: map.players_spawn[numeroJoueur].y
+            }, Player.defaultSize, map, numeroJoueur);
+        case Roles.Sorciere:
+            return new Sorciere(ctx, environment, {
+                x: map.players_spawn[numeroJoueur].x,
+                y: map.players_spawn[numeroJoueur].y
+            }, Player.defaultSize, map, numeroJoueur);
+        case Roles.Voyante:
+            return new Voyante(ctx, environment, {
+                x: map.players_spawn[numeroJoueur].x,
+                y: map.players_spawn[numeroJoueur].y
+            }, Player.defaultSize, map, numeroJoueur);
+        case Roles.LoupGarou:
+            return new LoupGarou(ctx, environment, {
+                x: map.players_spawn[numeroJoueur].x,
+                y: map.players_spawn[numeroJoueur].y
+            }, Player.defaultSize, map, numeroJoueur);
+        default:
+            return new Villageois(ctx, environment, {
+                x: map.players_spawn[numeroJoueur].x,
+                y: map.players_spawn[numeroJoueur].y
+            }, Player.defaultSize, map, numeroJoueur);
+    }
 }
