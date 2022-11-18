@@ -2,6 +2,7 @@ import * as $ from 'jquery';
 import "../styles/vote.css";
 import "../styles/task.css";
 import "../styles/history.css";
+import "../styles/recompenses.css";
 import {Player} from "../entity/Displayables/Props/Player";
 import {Environment} from "../entity/Environment";
 import {PlayerMove} from "../entity/types/PlayerMove";
@@ -432,6 +433,7 @@ async function init(){
     });
 
     socket.on("nb_tasks", (nb) => {
+        //todo afficher ça quelque part
         console.log(`nombre total de tâches restantes : ${nb}`);
     });
 
@@ -459,6 +461,25 @@ async function init(){
     socket.on("history", (history) => {
         $("#history").html(history);
         canvas.hidden = true;
+    });
+
+    socket.on("recompenses", ({niveau, gold, skins, roles}) => {
+        $("#recompenses").removeAttr("hidden");
+        const recompenses = $("#affichage_recompenses");
+        const affichage_gold = $("<div>").append($("<img src='/img/coin.png' width='25' alt=''>")).append($("<span>").text(gold));
+        const affichage_niveau = $("<div>").append($("<span>").text(`Niveau ${niveau.new}`));
+        recompenses.append(affichage_gold).append(affichage_niveau);
+        for (const s of skins) {
+            recompenses.append(
+                $("<div>").append($(`<img src='/skins/${s.lien}/3.png' alt="" width="80">`)).append($("<span>").text(s.name))
+            );
+        }
+        for (const r of roles) {
+            recompenses.append(
+                $("<div>").append($(`<img src='${r.image}' alt="" width="80">`)).append($("<span>").text(r.name))
+            );
+        }
+        $("#recompenses_close").on("click", () => {$("#recompenses").remove()});
     });
 
     for (const o of player.environment.interactions) {

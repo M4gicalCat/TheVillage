@@ -371,9 +371,9 @@ export class Partie {
                     user.nbPartiesGagnees++;
                 }
             }
-            user.nbPartiesJouees++;/*
+            user.nbPartiesJouees++;
             const last_level = user.niveau,
-                last_gold = user.argent;*/
+                last_gold = user.argent;
             const lvls = [];
             while (user.xp >= (user.niveau + 1) * 10) {
                 user.niveau += 1;
@@ -386,12 +386,21 @@ export class Partie {
                     where: {niveau: In(lvls)},
                     relations: ["roles", "skins"]
                 });
-                console.log(recompenses);
+                const skins = [];
+                const roles = [];
                 for (const r of recompenses) {
                     user.argent += r.gold;
                     user.skins.push(...r.skins);
+                    skins.push(...r.skins);
                     user.roles.push(...r.roles);
+                    roles.push(...r.roles);
                 }
+                io.to(`pid_${user.id}`).emit("recompenses", {
+                    niveau: {last: last_level, new: user.niveau},
+                    gold: user.argent - last_gold,
+                    skins,
+                    roles,
+                });
             }
 
             await uRepo.save(user);
