@@ -25,7 +25,7 @@ export class User {
     son: number;
 
     @Column({
-        default: 1
+        default: 0
     })
     niveau :number;
 
